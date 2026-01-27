@@ -4,6 +4,7 @@ import config from './config';
 import routes from './app/routes';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
+import { AuthRoutes } from './app/modules/auth/auth.route';
 
 const app: Application = express();
 
@@ -17,6 +18,9 @@ app.use(
     })
 );
 
+// Application routes
+app.use('/api/auth', AuthRoutes);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -28,9 +32,6 @@ app.get('/', (req: Request, res: Response) => {
         version: '1.0.0',
     });
 });
-
-// Application routes
-app.use('/api/v1', routes);
 
 // Global error handler
 app.use(globalErrorHandler);

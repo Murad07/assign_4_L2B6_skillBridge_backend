@@ -18,11 +18,11 @@ app.use(
     })
 );
 
-// Application routes
-app.use('/api/auth', AuthRoutes);
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Application routes
+app.use('/api', routes);
 
 // Health check route
 app.get('/', (req: Request, res: Response) => {

@@ -1,59 +1,36 @@
-import { NextFunction, Request, Response } from "express";
-import { Prisma } from "../../../generated/prisma/client";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+import { ZodError } from 'zod';
+import config from '../../config';
+import handleZodError from '../../errors/handleZodError';
+import { TErrorSources } from '../types/error';
 
-function globalErrorHandler(err: any, req: Request, res: Response, next: NextFunction) {
-    let statusCode = 500;
-    let errorMessage = "Internal Server Error";
-    let errorDetails = err;
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  //setting default values
+  let statusCode = 500;
+  let message = 'Something went wrong!';
+  let errorSources: TErrorSources = [
+    {
+      path: '',
+      message: 'Something went wrong',
+    },
+  ];
 
-    if (err instanceof Prisma.PrismaClientValidationError) {
-        statusCode = 400;
-        errorMessage = "You provide incorrect field type or missing required field.";
-    }
-    else if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        switch (err.code) {
-            case 'P2002':
-                statusCode = 409;
-                errorMessage = "Unique constraint failed.";
-                break;
-            case 'P2003':
-                statusCode = 400;
-                errorMessage = "Foreign key constraint failed.";
-                break;
-            case 'P2025':
-                statusCode = 404;
-                errorMessage = "Record not found.";
-                break;
-            default:
-                statusCode = 400;
-                errorMessage = "Database request error.";
-        }
-    }
-    else if (err instanceof Prisma.PrismaClientUnknownRequestError) {
-        statusCode = 400;
-        errorMessage = "Database request error.";
-    }
-    else if (err instanceof Prisma.PrismaClientInitializationError) {
-        switch (err.errorCode) {
-            case 'P1000':
-                statusCode = 500;
-                errorMessage = "Database connection error.";
-                break;
-            case 'P1001':
-                statusCode = 500;
-                errorMessage = "Database connection error.";
-                break;
-            default:
-                statusCode = 500;
-                errorMessage = "Database initialization error.";
-        }
-    }
+  if (err instanceof ZodError) {
+    const simplifiedError = handleZodError(err);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSources = simplifiedError?.errorSources;
+  }
 
-    res.status(statusCode);
-    res.json({
-        message: errorMessage,
-        error: errorDetails,
-    });
-}
+  //ultimate return
+  return res.status(statusCode).json({
+    success: false,
+    message,
+    errorSources,
+    stack: config.node_env === 'development' ? err?.stack : null,
+  });
+};
 
 export default globalErrorHandler;

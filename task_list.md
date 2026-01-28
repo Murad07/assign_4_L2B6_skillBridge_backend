@@ -37,7 +37,7 @@ This document outlines the remaining backend tasks for the SkillBridge project, 
 *   **Goal**: Allow students to leave reviews for tutors after completed sessions.
 *   **File Structure**: Create `src/app/modules/review/` with `review.controller.ts`, `review.service.ts`, `review.route.ts`, and `review.validation.ts`.
 *   **Endpoints**:
-    *   [ ] `POST /api/reviews`: Create new review (Student role).
+    *   [x] `POST /api/reviews`: Create new review (Student role).
         *   Implement Zod validation for review data (rating, comment, bookingId).
         *   Controller logic to handle review submission.
         *   Service logic to create review, ensuring it's linked to a completed booking and that only one review per booking is allowed.

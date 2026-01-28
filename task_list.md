@@ -49,7 +49,7 @@ This document outlines the remaining backend tasks for the SkillBridge project, 
 *   **Goal**: Admin to manage all users, and students to manage their own basic profile information.
 *   **File Structure**: Create `src/app/modules/user/` with `user.controller.ts`, `user.service.ts`, `user.route.ts`, and `user.validation.ts`.
 *   **Endpoints**:
-    *   [ ] `GET /api/admin/users`: Get all users (Admin role).
+    *   [x] `GET /api/admin/users`: Get all users (Admin role).
         *   Controller logic to fetch a list of all users (students and tutors).
         *   Service logic to retrieve users, potentially with search/pagination.
         *   Apply `auth(UserRole.ADMIN)` middleware.

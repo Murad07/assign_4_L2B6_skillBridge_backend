@@ -1,0 +1,84 @@
+import { prisma } from '../../../lib/prisma';
+import ApiError from '../../../errors/ApiError';
+import httpStatus from 'http-status';
+
+type IAdminListOptions = {
+    page?: number;
+    limit?: number;
+    role?: string;
+    status?: string;
+    search?: string;
+};
+
+const getAllUsersForAdmin = async (opts: IAdminListOptions) => {
+    const page = opts.page && opts.page > 0 ? opts.page : 1;
+    const limit = opts.limit && opts.limit > 0 ? opts.limit : 10;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (opts.role) where.role = opts.role;
+    if (opts.status) where.status = opts.status;
+    if (opts.search) {
+        where.OR = [
+            { name: { contains: opts.search, mode: 'insensitive' } },
+            { email: { contains: opts.search, mode: 'insensitive' } },
+        ];
+    }
+
+    const [total, users] = await Promise.all([
+        prisma.user.count({ where }),
+        prisma.user.findMany({
+            where,
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                phone: true,
+                status: true,
+                createdAt: true,
+                updatedAt: true,
+                tutorProfile: {
+                    select: {
+                        id: true,
+                        hourlyRate: true,
+                        rating: true,
+                        totalReviews: true,
+                        isApproved: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: limit,
+        }),
+    ]);
+
+    return {
+        meta: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        },
+        data: users,
+    };
+};
+
+const getUserById = async (id: string) => {
+    const user = await prisma.user.findUnique({
+        where: { id },
+        include: { tutorProfile: true },
+    });
+
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    return user;
+};
+
+export const UserService = {
+    getAllUsersForAdmin,
+    getUserById,
+};

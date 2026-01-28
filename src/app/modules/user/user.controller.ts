@@ -1,0 +1,42 @@
+import { Request, Response } from 'express';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
+import { UserService } from './user.service';
+
+const getAllUsersForAdmin = catchAsync(async (req: Request, res: Response) => {
+    const { page, limit, role, status, search } = req.query;
+
+    const opts = {
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+        role: role ? String(role) : undefined,
+        status: status ? String(status) : undefined,
+        search: search ? String(search) : undefined,
+    };
+
+    const result = await UserService.getAllUsersForAdmin(opts);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Users fetched successfully',
+        data: result,
+    });
+});
+
+const getUserById = catchAsync(async (req: Request, res: Response) => {
+    const id = String(req.params.id);
+    const user = await UserService.getUserById(id);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User fetched successfully',
+        data: user,
+    });
+});
+
+export const UserController = {
+    getAllUsersForAdmin,
+    getUserById,
+};

@@ -17,21 +17,21 @@ const createBooking = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// const getUsersBookings = catchAsync(async (req: Request, res: Response) => {
-//     const userId = req.user?.id;
-//     const userRole = req.user?.role;
+const getUsersBookings = catchAsync(async (req: Request, res: Response) => {
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
 
-//     const result = await BookingService.getUsersBookings(userId as string, userRole as UserRole);
+    const result = await BookingService.getUsersBookings(userId as string, userRole as UserRole);
 
-//     sendResponse(res, {
-//         statusCode: 200,
-//         success: true,
-//         message: "User bookings fetched successfully",
-//         data: result,
-//     });
-// });
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "User bookings fetched successfully",
+        data: result,
+    });
+});
 
 export const BookingController = {
     createBooking,
-    // getUsersBookings,
+    getUsersBookings,
 };

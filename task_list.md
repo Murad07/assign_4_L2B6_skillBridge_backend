@@ -14,12 +14,12 @@ This document outlines the remaining backend tasks for the SkillBridge project, 
 *   **Goal**: Enable students to book sessions, and both students/tutors to view their bookings. Admins can view all bookings.
 *   **File Structure**: Create `src/app/modules/booking/` with `booking.controller.ts`, `booking.service.ts`, `booking.route.ts`, and `booking.validation.ts`.
 *   **Endpoints**:
-    *   [ ] `POST /api/bookings`: Create new booking (Student role).
+    *   [x] `POST /api/bookings`: Create new booking (Student role).
         *   Implement Zod validation for booking creation data.
         *   Controller logic to handle booking request.
         *   Service logic to create booking, including checking tutor's availability and preventing double-booking.
         *   Apply `auth(UserRole.STUDENT)` middleware.
-    *   [ ] `GET /api/bookings`: Get user's bookings (Student/Tutor roles).
+    *   [x] `GET /api/bookings`: Get user's bookings (Student/Tutor roles).
         *   Controller logic to fetch bookings based on the authenticated user's ID (studentId or tutorId).
         *   Service logic to query bookings with relevant details (e.g., associated tutor/student, subject).
         *   Apply `auth(UserRole.STUDENT, UserRole.TUTOR)` middleware.

@@ -14,4 +14,11 @@ router.post(
     BookingController.createBooking
 );
 
+// Student or Tutor - Get user's bookings
+router.get(
+    "/",
+    auth(UserRole.STUDENT, UserRole.TUTOR),
+    BookingController.getUsersBookings
+);
+
 export const BookingRoutes: Router = router;

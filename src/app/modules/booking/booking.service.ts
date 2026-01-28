@@ -2,6 +2,7 @@ import { Booking, BookingStatus, TutorProfile } from "../../../../generated/pris
 import { prisma } from "../../../lib/prisma";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
+import { UserRole } from "../../middlewares/auth";
 
 type ICreateBookingPayload = {
     tutorId: string;
@@ -113,6 +114,33 @@ const createBooking = async (studentId: string, payload: ICreateBookingPayload):
     return newBooking;
 };
 
+const getUsersBookings = async (userId: string, userRole: UserRole) => {
+    // Build where filter depending on role
+    let where: any = {};
+
+    if (userRole === UserRole.TUTOR) {
+        where.tutorId = userId;
+    } else if (userRole === UserRole.STUDENT) {
+        where.studentId = userId;
+    } else {
+        // unauthorized for other roles in this service method
+        throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to view bookings');
+    }
+
+    const bookings = await prisma.booking.findMany({
+        where,
+        include: {
+            student: { select: { id: true, name: true, email: true } },
+            tutor: { select: { id: true, name: true, email: true } },
+            review: true,
+        },
+        orderBy: [{ sessionDate: 'desc' }, { sessionTime: 'desc' }],
+    });
+
+    return bookings;
+};
+
 export const BookingService = {
     createBooking,
+    getUsersBookings,
 };

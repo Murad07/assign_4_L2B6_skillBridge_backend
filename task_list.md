@@ -23,11 +23,11 @@ This document outlines the remaining backend tasks for the SkillBridge project, 
         *   Controller logic to fetch bookings based on the authenticated user's ID (studentId or tutorId).
         *   Service logic to query bookings with relevant details (e.g., associated tutor/student, subject).
         *   Apply `auth(UserRole.STUDENT, UserRole.TUTOR)` middleware.
-    *   [ ] `GET /api/bookings/:id`: Get single booking details (Student/Tutor/Admin roles).
+    *   [x] `GET /api/bookings/:id`: Get single booking details (Student/Tutor/Admin roles).
         *   Controller logic to fetch a specific booking.
         *   Service logic to ensure the authenticated user has permission to view this booking.
         *   Apply `auth(UserRole.STUDENT, UserRole.TUTOR, UserRole.ADMIN)` middleware.
-    *   [ ] `GET /api/admin/bookings`: Get all bookings (Admin role).
+    *   [x] `GET /api/admin/bookings`: Get all bookings (Admin role).
         *   Controller logic to fetch all bookings for administrative overview.
         *   Service logic to retrieve all bookings, possibly with pagination/filtering.
         *   Apply `auth(UserRole.ADMIN)` middleware.

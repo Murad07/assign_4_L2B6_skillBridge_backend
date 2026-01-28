@@ -46,8 +46,32 @@ const getBookingById = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getAllBookingsForAdmin = catchAsync(async (req: Request, res: Response) => {
+    const { page, limit, status, tutorId, studentId, fromDate, toDate } = req.query;
+
+    const parsed = {
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+        status: status ? String(status) : undefined,
+        tutorId: tutorId ? String(tutorId) : undefined,
+        studentId: studentId ? String(studentId) : undefined,
+        fromDate: fromDate ? String(fromDate) : undefined,
+        toDate: toDate ? String(toDate) : undefined,
+    };
+
+    const result = await BookingService.getAllBookingsForAdmin(parsed);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Bookings fetched successfully',
+        data: result,
+    });
+});
+
 export const BookingController = {
     createBooking,
     getUsersBookings,
     getBookingById,
+    getAllBookingsForAdmin,
 };

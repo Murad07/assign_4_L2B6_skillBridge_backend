@@ -165,8 +165,58 @@ const getBookingById = async (bookingId: string, requesterId: string, requesterR
     return booking;
 };
 
+const getAllBookingsForAdmin = async (options: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    tutorId?: string;
+    studentId?: string;
+    fromDate?: string;
+    toDate?: string;
+}) => {
+    const page = options.page && options.page > 0 ? options.page : 1;
+    const limit = options.limit && options.limit > 0 ? options.limit : 10;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (options.status) where.status = options.status;
+    if (options.tutorId) where.tutorId = options.tutorId;
+    if (options.studentId) where.studentId = options.studentId;
+    if (options.fromDate || options.toDate) {
+        where.sessionDate = {};
+        if (options.fromDate) where.sessionDate.gte = new Date(options.fromDate);
+        if (options.toDate) where.sessionDate.lte = new Date(options.toDate);
+    }
+
+    const [total, bookings] = await Promise.all([
+        prisma.booking.count({ where }),
+        prisma.booking.findMany({
+            where,
+            include: {
+                student: { select: { id: true, name: true, email: true } },
+                tutor: { select: { id: true, name: true, email: true } },
+                review: true,
+            },
+            orderBy: [{ sessionDate: 'desc' }, { sessionTime: 'desc' }],
+            skip,
+            take: limit,
+        })
+    ]);
+
+    return {
+        meta: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        },
+        data: bookings,
+    };
+};
+
 export const BookingService = {
     createBooking,
     getUsersBookings,
     getBookingById,
+    getAllBookingsForAdmin,
 };

@@ -21,11 +21,20 @@ router.get(
     BookingController.getUsersBookings
 );
 
+// Admin - get all bookings with pagination/filtering
+router.get(
+    "/admin",
+    auth(UserRole.ADMIN),
+    BookingController.getAllBookingsForAdmin
+);
+
 // Get single booking - Student, Tutor or Admin (permission checked in service)
 router.get(
     "/:id",
     auth(UserRole.STUDENT, UserRole.TUTOR, UserRole.ADMIN),
     BookingController.getBookingById
 );
+
+
 
 export const BookingRoutes: Router = router;

@@ -4,20 +4,34 @@ enum UserRole {
     Admin
 }
 
+enum BookingStatus {
+    CONFIRMED
+    COMPLETED
+    CANCELLED
+}
+
 model User {
-    id            String    @id
+    id            String   @id
     name          String
     email         String
-    emailVerified Boolean   @default(false)
+    emailVerified Boolean  @default(false)
     image         String?
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
-    sessions      Session[]
-    accounts      Account[]
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    // Better Auth relations
+    sessions Session[]
+    accounts Account[]
 
     role   String? @default("USER")
     phone  String?
     status String? @default("ACTIVE")
+
+    // Application relations (NEW)
+    tutorProfile      TutorProfile?
+    bookingsAsStudent Booking[]     @relation("StudentBookings")
+    bookingsAsTutor   Booking[]     @relation("TutorBookings")
+    reviews           Review[]
 
     @@unique([email])
     @@map("user")
@@ -57,4 +71,89 @@ model Account {
 
     @@index([userId])
     @@map("account")
+}
+
+model TutorProfile {
+    id            String   @id @default(cuid())
+    userId        String   @unique
+    bio           String   @db.Text
+    expertise     String[]
+    hourlyRate    Float
+    experience    String?
+    education     String?
+    rating        Float    @default(0)
+    totalReviews  Int      @default(0)
+    totalSessions Int      @default(0)
+    availability  Json? // Store as JSON: [{ day: "Monday", slots: ["09:00-10:00", "10:00-11:00"] }]
+    isApproved    Boolean  @default(false)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    // Relations
+    user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    categories Category[]
+
+    @@map("tutor_profile")
+}
+
+model Category {
+    id          String   @id @default(cuid())
+    name        String   @unique
+    description String?  @db.Text
+    icon        String?
+    isActive    Boolean  @default(true)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    // Relations
+    tutors TutorProfile[]
+
+    @@map("category")
+}
+
+model Booking {
+    id                 String        @id @default(cuid())
+    studentId          String
+    tutorId            String
+    sessionDate        DateTime
+    sessionTime        String
+    duration           Int           @default(60) // minutes
+    subject            String
+    price              Float
+    status             BookingStatus @default(CONFIRMED)
+    notes              String?       @db.Text
+    meetingLink        String?
+    cancelledBy        String?
+    cancellationReason String?       @db.Text
+    createdAt          DateTime      @default(now())
+    updatedAt          DateTime      @updatedAt
+
+    // Relations
+    student User    @relation("StudentBookings", fields: [studentId], references: [id])
+    tutor   User    @relation("TutorBookings", fields: [tutorId], references: [id])
+    review  Review?
+
+    @@index([studentId])
+    @@index([tutorId])
+    @@index([sessionDate])
+    @@map("booking")
+}
+
+model Review {
+    id        String   @id @default(cuid())
+    bookingId String   @unique
+    studentId String
+    tutorId   String
+    rating    Int // 1-5
+    comment   String   @db.Text
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+    student User    @relation(fields: [studentId], references: [id])
+
+    @@index([tutorId])
+    @@index([studentId])
+    @@map("review")
 }

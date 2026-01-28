@@ -53,7 +53,7 @@ This document outlines the remaining backend tasks for the SkillBridge project, 
         *   Controller logic to fetch a list of all users (students and tutors).
         *   Service logic to retrieve users, potentially with search/pagination.
         *   Apply `auth(UserRole.ADMIN)` middleware.
-    *   [ ] `PATCH /api/admin/users/:id`: Update user status (ban/unban) (Admin role).
+    *   [x] `PATCH /api/admin/users/:id`: Update user status (ban/unban) (Admin role).
         *   Implement Zod validation for user status update.
         *   Controller logic to change a user's status (e.g., 'ACTIVE', 'INACTIVE', 'BANNED').
         *   Service logic to update the user record in the database.

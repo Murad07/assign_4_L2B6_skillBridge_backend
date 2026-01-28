@@ -82,3 +82,21 @@ export const UserService = {
     getAllUsersForAdmin,
     getUserById,
 };
+
+const updateUserStatus = async (id: string, status: string) => {
+    const allowed = ['ACTIVE', 'INACTIVE', 'BANNED'];
+    if (!allowed.includes(status)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid status value');
+    }
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    const updated = await prisma.user.update({ where: { id }, data: { status } });
+    return updated;
+};
+
+// export update function
+export default updateUserStatus;

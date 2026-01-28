@@ -140,7 +140,33 @@ const getUsersBookings = async (userId: string, userRole: UserRole) => {
     return bookings;
 };
 
+const getBookingById = async (bookingId: string, requesterId: string, requesterRole: UserRole) => {
+    const booking = await prisma.booking.findUnique({
+        where: { id: bookingId },
+        include: {
+            student: { select: { id: true, name: true, email: true } },
+            tutor: { select: { id: true, name: true, email: true } },
+            review: true,
+        }
+    });
+
+    if (!booking) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
+    }
+
+    // Permission checks
+    if (requesterRole === UserRole.STUDENT && booking.studentId !== requesterId) {
+        throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to view this booking');
+    }
+    if (requesterRole === UserRole.TUTOR && booking.tutorId !== requesterId) {
+        throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to view this booking');
+    }
+
+    return booking;
+};
+
 export const BookingService = {
     createBooking,
     getUsersBookings,
+    getBookingById,
 };

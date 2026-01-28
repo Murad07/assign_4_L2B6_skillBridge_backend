@@ -21,4 +21,11 @@ router.get(
     BookingController.getUsersBookings
 );
 
+// Get single booking - Student, Tutor or Admin (permission checked in service)
+router.get(
+    "/:id",
+    auth(UserRole.STUDENT, UserRole.TUTOR, UserRole.ADMIN),
+    BookingController.getBookingById
+);
+
 export const BookingRoutes: Router = router;

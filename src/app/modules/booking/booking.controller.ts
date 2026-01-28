@@ -31,7 +31,23 @@ const getUsersBookings = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getBookingById = catchAsync(async (req: Request, res: Response) => {
+    const bookingId = req.params.id;
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+
+    const result = await BookingService.getBookingById(bookingId as string, userId as string, userRole as UserRole);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Booking fetched successfully',
+        data: result,
+    });
+});
+
 export const BookingController = {
     createBooking,
     getUsersBookings,
+    getBookingById,
 };

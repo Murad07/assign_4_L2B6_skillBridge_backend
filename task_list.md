@@ -58,7 +58,7 @@ This document outlines the remaining backend tasks for the SkillBridge project, 
         *   Controller logic to change a user's status (e.g., 'ACTIVE', 'INACTIVE', 'BANNED').
         *   Service logic to update the user record in the database.
         *   Apply `auth(UserRole.ADMIN)` middleware.
-    *   [ ] `PATCH /api/users/profile`: Update current user's profile (Student/Tutor roles).
+    *   [x] `PATCH /api/users/profile`: Update current user's profile (Student/Tutor roles).
         *   Implement Zod validation for user profile update (e.g., name, phone).
         *   Controller logic to allow the authenticated user to update their own basic `User` information.
         *   Service logic to update the user record.

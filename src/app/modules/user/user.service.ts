@@ -78,10 +78,7 @@ const getUserById = async (id: string) => {
     return user;
 };
 
-export const UserService = {
-    getAllUsersForAdmin,
-    getUserById,
-};
+
 
 const updateUserStatus = async (id: string, status: string) => {
     const allowed = ['ACTIVE', 'INACTIVE', 'BANNED'];
@@ -98,5 +95,30 @@ const updateUserStatus = async (id: string, status: string) => {
     return updated;
 };
 
-// export update function
-export default updateUserStatus;
+const updateUserProfile = async (id: string, payload: { name?: string; phone?: string }) => {
+    const { name, phone } = payload;
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    const updated = await prisma.user.update({
+        where: { id },
+        data: {
+            ...(name ? { name } : {}),
+            ...(phone ? { phone } : {}),
+        },
+    });
+
+    return updated;
+};
+
+export const UserService = {
+    getAllUsersForAdmin,
+    getUserById,
+    updateUserStatus,
+    updateUserProfile,
+};
+
+

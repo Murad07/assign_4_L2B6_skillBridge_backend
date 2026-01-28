@@ -54,10 +54,63 @@ const createCategory = async (req: Request, res: Response, next: NextFunction) =
     }
 }
 
+const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({
+                error: "Unauthorized!",
+            });
+        }
 
+        if (user.role !== UserRole.ADMIN) {
+            return res.status(403).json({
+                error: "Forbidden - Admin access required"
+            });
+        }
+
+        const categoryId = req.params.id;
+        const updateData = req.body;
+
+        const updatedCategory = await categoryService.updateCategory(categoryId as string, updateData);
+        res.status(200).json(updatedCategory);
+    } catch (e) {
+        next(e);
+    }
+}
+
+const deleteCategory = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({
+                error: "Unauthorized!",
+            });
+        }
+
+        if (user.role !== UserRole.ADMIN) {
+            return res.status(403).json({
+                error: "Forbidden - Admin access required"
+            });
+        }
+
+        const categoryId = req.params.id;
+
+        const deletedCategory = await categoryService.deleteCategory(categoryId as string);
+        res.status(200).json(deletedCategory);
+    } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : "Category deletion failed";
+        res.status(400).json({
+            error: errorMessage,
+            details: e
+        });
+    }
+}
 
 export const CategoryController = {
     getAllCategories,
     getCategoryById,
-    createCategory
+    createCategory,
+    updateCategory,
+    deleteCategory
 };

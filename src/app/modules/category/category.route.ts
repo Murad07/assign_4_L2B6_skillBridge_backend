@@ -21,6 +21,18 @@ router.post(
     CategoryController.createCategory
 );
 
+// Admin only - Update category
+router.patch(
+    "/:id",
+    auth(UserRole.ADMIN),
+    CategoryController.updateCategory
+);
 
+// Admin only - Delete category (soft delete)
+router.delete(
+    "/:id",
+    auth(UserRole.ADMIN),
+    CategoryController.deleteCategory
+);
 
 export const CategoryRouter: Router = router;

@@ -3,7 +3,7 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import config from '../../config';
-import handleZodError from '../../errors/handleZodError';
+import { ApiError, handleZodError } from '../../errors';
 import { TErrorSources } from '../types/error';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
@@ -17,11 +17,29 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     },
   ];
 
+  // in development, log the full error to help debugging
+  if (config.node_env === 'development') {
+    // eslint-disable-next-line no-console
+    console.error('Global Error Handler caught:', err);
+  }
+
   if (err instanceof ZodError) {
     const simplifiedError = handleZodError(err);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
+  } else if (err instanceof ApiError || (err && typeof (err as any).statusCode === 'number')) {
+    // sometimes errors may not pass instanceof checks depending on how they're imported/constructed
+    // so also accept any object that has a numeric statusCode
+    const e: any = err;
+    statusCode = e?.statusCode ?? 500;
+    message = e?.message ?? message;
+    errorSources = [
+      {
+        path: '',
+        message: e?.message ?? message,
+      },
+    ];
   }
 
   //ultimate return

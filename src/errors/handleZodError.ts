@@ -1,11 +1,10 @@
 import { ZodError, ZodIssue } from 'zod';
-import { TErrorSources, TGenericErrorResponse } from '../app/types/error';
 
-const handleZodError = (err: ZodError): TGenericErrorResponse => {
-  const errorSources: TErrorSources = err.issues.map((issue: ZodIssue) => {
+const handleZodError = (err: ZodError) => {
+  const errorSources = err.issues.map((issue: ZodIssue) => {
     return {
-      path: issue?.path[issue.path.length - 1],
-      message: issue.message,
+      path: issue?.path[issue.path.length - 1] as string | number, // Type assertion
+      message: issue?.message,
     };
   });
 

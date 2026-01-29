@@ -1,0 +1,11 @@
+# Ignore build artifacts and compiled API files from being uploaded to Vercel
+dist/
+build/
+node_modules/
+*.log
+
+# Ignore compiled JS API entry files — prefer source `api/*.ts`
+api/*.js
+
+# Local env files
+.env

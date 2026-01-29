@@ -1,7 +1,7 @@
 import { prisma } from '../../../lib/prisma';
 import ApiError from '../../../errors/ApiError';
 import httpStatus from 'http-status';
-import { BookingStatus } from '../../../../generated/prisma/client';
+import { BookingStatus } from '@prisma/client';
 
 type ICreateReviewPayload = {
     bookingId: string;

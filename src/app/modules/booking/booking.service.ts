@@ -1,4 +1,4 @@
-import { Booking, BookingStatus, TutorProfile } from "../../../../generated/prisma/client";
+import { Booking, BookingStatus, TutorProfile } from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";

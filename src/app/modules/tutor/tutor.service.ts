@@ -1,4 +1,4 @@
-import { TutorProfile, Prisma } from "../../../../generated/prisma/client";
+import { TutorProfile, Prisma } from "@prisma/client";
 import { TutorProfileWhereInput } from "../../../../generated/prisma/models";
 import { prisma } from "../../../lib/prisma";
 

@@ -3,7 +3,8 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import config from '../../config/index.js';
-import { ApiError, handleZodError } from '../../errors/index.js';
+import ApiError from '../../errors/ApiError.js';
+import handleZodError from '../../errors/handleZodError.js';
 import { TErrorSources } from '../types/error.js';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {

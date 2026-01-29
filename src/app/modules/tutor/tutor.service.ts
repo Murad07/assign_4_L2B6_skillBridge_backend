@@ -1,5 +1,4 @@
 import { TutorProfile, Prisma } from "@prisma/client";
-import { TutorProfileWhereInput } from "../../../../generated/prisma/models";
 import { prisma } from "../../../lib/prisma";
 
 const getAllTutors = async (
@@ -29,7 +28,7 @@ const getAllTutors = async (
         sortOrder: string
     }) => {
 
-    const andConditions: TutorProfileWhereInput[] = [
+    const andConditions: Prisma.TutorProfileWhereInput[] = [
         {
             isApproved: true,
             user: {

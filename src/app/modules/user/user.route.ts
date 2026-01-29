@@ -1,6 +1,6 @@
 import express from 'express';
 import auth, { UserRole } from '../../middlewares/auth.js';
-import { UserController } from './user.controller';
+import { UserController } from './user.controller.js';
 import validateRequest from '../../middlewares/validateRequest.js';
 import { UserValidation } from './user.validation.js';
 

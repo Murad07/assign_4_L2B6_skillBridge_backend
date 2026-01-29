@@ -1,4 +1,7 @@
+
+import type { Request, Response } from 'express';
 import app from '../src/app';
+import { prisma } from '../src/lib/prisma';
 
 // Sanity-check required environment variables early so the error is clear in logs
 const requiredEnv = ['DATABASE_URL'];
@@ -19,5 +22,19 @@ process.on('uncaughtException', (err) => {
 });
 
 // Vercel's Node runtime expects a default export function (req, res).
-// An Express `app` is itself a request handler, so we can export it directly.
-export default app;
+// We wrap the Express app in a handler function to ensure the database
+// is connected before processing requests.
+export default async function handler(req: Request, res: Response) {
+    try {
+        await prisma.$connect();
+        // console.log('Connected to the database successfully.');
+        return app(req, res);
+    } catch (error) {
+        console.error('Error connecting to the database:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    } finally {
+        await prisma.$disconnect();
+        // console.log('Disconnected from the database.');
+    }
+}
+

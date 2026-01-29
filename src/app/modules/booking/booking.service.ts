@@ -1,5 +1,5 @@
 import { Booking, BookingStatus, TutorProfile } from "@prisma/client";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "../../../lib/prisma.js";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
 import { UserRole } from "../../middlewares/auth";

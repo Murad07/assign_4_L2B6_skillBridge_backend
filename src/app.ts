@@ -1,7 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import config from './config';
-import routes from './app/routes';
+import config from './config/index.js';
+import routes from './app/routes/index.js';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
 import { AuthRoutes } from './app/modules/auth/auth.route';

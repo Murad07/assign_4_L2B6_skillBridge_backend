@@ -9,6 +9,9 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
+    // Provide a secret explicitly so the library doesn't fall back to a default insecure secret.
+    // Prefer BETTER_AUTH_SECRET; fallback to JWT_SECRET if present.
+    secret: process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET,
     user: {
         additionalFields: {
             role: {

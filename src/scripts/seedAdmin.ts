@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import config from "../config";
+import config from "../config/index.js";
 
 async function seedAdmin() {
     try {

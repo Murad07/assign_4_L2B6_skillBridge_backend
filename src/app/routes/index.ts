@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { AuthRoutes } from '../modules/auth/auth.route';
+import { AuthRoutes } from '../modules/auth/auth.route.js';
 import { CategoryRouter } from '../modules/category/category.route';
 import { TutorRouter } from '../modules/tutor/tutor.route';
-import { BookingRoutes } from '../modules/booking/booking.route'; // Import BookingRoutes
+import { BookingRoutes } from '../modules/booking/booking.route.js'; // Import BookingRoutes
 import { ReviewRoutes } from '../modules/review/review.route';
 import { UserRoutes } from '../modules/user/user.route';
 import { ProfileRoutes } from '../modules/user/profile.route';

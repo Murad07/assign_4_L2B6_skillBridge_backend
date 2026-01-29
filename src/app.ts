@@ -4,7 +4,7 @@ import config from './config/index.js';
 import routes from './app/routes/index.js';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
-import { AuthRoutes } from './app/modules/auth/auth.route';
+import { AuthRoutes } from './app/modules/auth/auth.route.js';
 
 const app: Application = express();
 

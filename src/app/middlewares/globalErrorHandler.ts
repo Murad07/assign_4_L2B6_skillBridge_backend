@@ -4,7 +4,7 @@ import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import config from '../../config';
 import { ApiError, handleZodError } from '../../errors';
-import { TErrorSources } from '../types/error';
+import { TErrorSources } from '../types/error.js';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   //setting default values

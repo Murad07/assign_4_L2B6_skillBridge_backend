@@ -1,5 +1,5 @@
-import ApiError from "./ApiError";
-import handleZodError from "./handleZodError";
+import ApiError from "./ApiError.js";
+import handleZodError from "./handleZodError.js";
 
 export {
     ApiError,

@@ -15,4 +15,6 @@ export default {
         email: process.env.ADMIN_EMAIL || 'admin@skillbridge.com',
         password: process.env.ADMIN_PASSWORD || 'admin123',
     },
+    frontend_url: process.env.FRONTEND_URL || 'http://localhost:3000',
+    base_url: process.env.BASE_URL || 'http://localhost:5000',
 };

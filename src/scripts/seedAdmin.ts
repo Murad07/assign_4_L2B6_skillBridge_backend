@@ -1,13 +1,13 @@
 import { prisma } from "../lib/prisma";
-import { UserRole } from "../app/middlewares/auth";
+import config from "../config";
 
 async function seedAdmin() {
     try {
         console.log("***** Admin Seeding Started....")
         const adminData = {
             name: "Admin User",
-            email: "admin@admin.com",
-            password: "password12345",
+            email: config.admin.email,
+            password: config.admin.password,
             role: 'Admin'
         }
         console.log("***** Checking Admin Exist or not")
@@ -19,19 +19,25 @@ async function seedAdmin() {
         });
 
         if (existingUser) {
-            throw new Error("User already exists!!");
+            console.log("Admin user already exists. Skipping creation.");
+            return;
         }
 
-        const signUpAdmin = await fetch("http://localhost:5000/api/auth/sign-up/email", {
+        const baseUrl = `http://localhost:${config.port}`;
+        const signUpUrl = `${baseUrl}/api/auth/sign-up/email`;
+
+        console.log("***** Sending Admin Sign Up Request to", signUpUrl)
+
+        const signUpAdmin = await fetch(signUpUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Origin": "http://localhost:5000",
+                "Origin": baseUrl,
             },
             body: JSON.stringify(adminData)
-        })
+        });
 
-        console.log("***** Admin Sign Up Request Sent", signUpAdmin)
+        console.log("***** Admin Sign Up Request Sent", signUpAdmin.status)
 
         if (signUpAdmin.ok) {
             console.log("**** Admin created")
@@ -45,6 +51,9 @@ async function seedAdmin() {
             })
 
             console.log("**** Email verification status updated!")
+        } else {
+            const text = await signUpAdmin.text();
+            console.error('Sign up failed:', signUpAdmin.status, text);
         }
         console.log("******* SUCCESS ******")
 

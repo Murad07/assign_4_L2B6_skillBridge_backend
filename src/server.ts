@@ -14,10 +14,11 @@ async function main() {
         })
     } catch (error) {
         console.error('Error connecting to the database:', error)
-    } finally {
-        // Disconnect the client
-        await prisma.$disconnect()
     }
+    // Remove $disconnect() in serverless
 }
 
-main(); 
+// Only run if not in Vercel
+if (process.env.VERCEL !== '1') {
+    main();
+}

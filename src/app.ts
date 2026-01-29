@@ -1,10 +1,10 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import config from './config/index.js';
 // routes will be dynamically imported below to avoid loading heavy modules on cold start
 import globalErrorHandler from './app/middlewares/globalErrorHandler.js';
 import notFound from './app/middlewares/notFound.js';
-import { AuthRoutes } from './app/modules/auth/auth.route.js';
+import router from './app/routes/index.js';
 
 const app: Application = express();
 
@@ -22,16 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Application routes
-// Dynamically import routes so the root health-check can respond without loading
-// all controllers/services (which reduces cold-start latency).
-import('./app/routes/index.js')
-    .then((m) => {
-        app.use('/api', m.default);
-    })
-    .catch((err) => {
-        // eslint-disable-next-line no-console
-        console.error('Failed to load routes:', err);
-    });
+app.use('/api', router);
 
 // Health check route
 app.get('/', (req: Request, res: Response) => {

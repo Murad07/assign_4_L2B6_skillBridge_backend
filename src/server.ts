@@ -1,4 +1,6 @@
-import app from "./app"
+// Import the compiled app file with explicit extension to avoid directory
+// import ambiguity after compilation (dist/app vs dist/app.js)
+import app from "./app.js"
 import { prisma } from "./lib/prisma.js"
 
 const PORT = process.env.PORT || 5000

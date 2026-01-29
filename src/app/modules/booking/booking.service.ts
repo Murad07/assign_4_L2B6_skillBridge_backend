@@ -1,8 +1,8 @@
 import { Booking, BookingStatus, TutorProfile } from "@prisma/client";
 import { prisma } from "../../../lib/prisma.js";
-import ApiError from "../../../errors/ApiError";
+import ApiError from "../../../errors/ApiError.js";
 import httpStatus from "http-status";
-import { UserRole } from "../../middlewares/auth";
+import { UserRole } from "../../middlewares/auth.js";
 
 type ICreateBookingPayload = {
     tutorId: string;

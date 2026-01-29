@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { BookingService } from "./booking.service";
-import { UserRole } from "../../middlewares/auth";
+import catchAsync from "../../utils/catchAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
+import { BookingService } from "./booking.service.js";
+import { UserRole } from "../../middlewares/auth.js";
 
 const createBooking = catchAsync(async (req: Request, res: Response) => {
     // Student ID will come from the authenticated user

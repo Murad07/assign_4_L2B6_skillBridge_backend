@@ -1,5 +1,5 @@
 import { prisma } from '../../../lib/prisma.js';
-import ApiError from '../../../errors/ApiError';
+import ApiError from '../../../errors/ApiError.js';
 import httpStatus from 'http-status';
 
 type IAdminListOptions = {

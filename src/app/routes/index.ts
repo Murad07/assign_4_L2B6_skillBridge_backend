@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { AuthRoutes } from '../modules/auth/auth.route.js';
-import { CategoryRouter } from '../modules/category/category.route';
-import { TutorRouter } from '../modules/tutor/tutor.route';
+import { CategoryRouter } from '../modules/category/category.route.js';
+import { TutorRouter } from '../modules/tutor/tutor.route.js';
 import { BookingRoutes } from '../modules/booking/booking.route.js'; // Import BookingRoutes
-import { ReviewRoutes } from '../modules/review/review.route';
-import { UserRoutes } from '../modules/user/user.route';
-import { ProfileRoutes } from '../modules/user/profile.route';
+import { ReviewRoutes } from '../modules/review/review.route.js';
+import { UserRoutes } from '../modules/user/user.route.js';
+import { ProfileRoutes } from '../modules/user/profile.route.js';
 
 const router = Router();
 

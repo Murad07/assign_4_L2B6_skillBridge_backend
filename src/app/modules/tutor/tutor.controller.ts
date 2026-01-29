@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { tutorService } from "./tutor.service";
-import { UserRole } from "../../middlewares/auth";
-import paginationSortingHelper from "../../../helpers/paginationSortingHelper";
+import { tutorService } from "./tutor.service.js";
+import { UserRole } from "../../middlewares/auth.js";
+import paginationSortingHelper from "../../../helpers/paginationSortingHelper.js";
 
 const getAllTutors = async (req: Request, res: Response, next: NextFunction) => {
     try {

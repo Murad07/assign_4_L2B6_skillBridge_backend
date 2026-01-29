@@ -1,8 +1,8 @@
 import express from 'express';
-import { auth } from '../../../lib/auth';
+import { auth } from '../../../lib/auth.js';
 import { toNodeHandler } from "better-auth/node";
 import { AuthValidation } from './auth.validation';
-import validateRequest from '../../middlewares/validateRequest';
+import validateRequest from '../../middlewares/validateRequest.js';
 
 const router = express.Router();
 

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { categoryService } from "./category.service";
-import { UserRole } from "../../middlewares/auth";
+import { categoryService } from "./category.service.js";
+import { UserRole } from "../../middlewares/auth.js";
 
 const getAllCategories = async (req: Request, res: Response, next: NextFunction) => {
     try {

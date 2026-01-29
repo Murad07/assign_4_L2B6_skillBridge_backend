@@ -1,23 +1,26 @@
 // Serverless entry for Vercel: re-export the Express app from src/app
 // Vercel will compile TypeScript files in the `api/` directory automatically.
-// Import the compiled JS from `dist` so the runtime can resolve a concrete file
-// When deploying, Vercel runs the `vercel-build` (tsc) which outputs to `dist/`.
-// Fallback to `src` during local dev if `dist/app.js` does not exist.
+// Use ESM-safe resolution: derive __dirname from import.meta.url and use dynamic
+// import() so this module works as an ES module on Vercel. Top-level await is
+// used to synchronously export the app after loading the correct target.
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
 
-const distAppPath = path.join(__dirname, '..', 'dist', 'app.js');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const distAppPathAbs = path.join(__dirname, '..', 'dist', 'app.js');
 
 let app;
-if (fs.existsSync(distAppPath)) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    app = require(distAppPath).default;
+if (fs.existsSync(distAppPathAbs)) {
+    // Import the compiled app from dist as an absolute file URL
+    const mod = await import(pathToFileURL(distAppPathAbs).href);
+    app = mod.default;
 } else {
-    // Local/dev path: import from source (ensure TS runner supports it)
-    // Use dynamic import to avoid static ESM resolution issues during build
-    // Note: This branch is only for local dev where tsx/ts-node runs src directly.
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    app = require('../src/app').default;
+    // During local dev (when running src directly), import the source app.
+    const mod = await import('../src/app');
+    app = mod.default;
 }
 
 export default app;

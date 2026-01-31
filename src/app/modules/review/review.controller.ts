@@ -20,7 +20,7 @@ const createReview = catchAsync(async (req: Request, res: Response) => {
 const getReviewsForTutor = catchAsync(async (req: Request, res: Response) => {
     const { tutorId } = req.params;
 
-    const result = await ReviewService.getReviewsForTutor(tutorId);
+    const result = await ReviewService.getReviewsForTutor(tutorId as string);
 
     sendResponse(res, {
         statusCode: 200,

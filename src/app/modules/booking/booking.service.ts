@@ -214,9 +214,49 @@ const getAllBookingsForAdmin = async (options: {
     };
 };
 
+const updateBookingStatus = async (
+    bookingId: string,
+    requesterId: string,
+    requesterRole: UserRole,
+    newStatus: BookingStatus
+) => {
+    const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+
+    if (!booking) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
+    }
+
+    // Authorization: Only the assigned tutor can mark as COMPLETED, only the student can CANCEL
+    if (newStatus === BookingStatus.COMPLETED) {
+        if (requesterRole !== UserRole.TUTOR || booking.tutorId !== requesterId) {
+            throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to complete this booking');
+        }
+    } else if (newStatus === BookingStatus.CANCELLED) {
+        if (requesterRole !== UserRole.STUDENT || booking.studentId !== requesterId) {
+            throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to cancel this booking');
+        }
+    } else {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid status update');
+    }
+
+    // You can't change status of an already completed or cancelled booking
+    if (booking.status === BookingStatus.COMPLETED || booking.status === BookingStatus.CANCELLED) {
+        throw new ApiError(httpStatus.BAD_REQUEST, `Booking has already been ${booking.status.toLowerCase()}`);
+    }
+
+
+    const updatedBooking = await prisma.booking.update({
+        where: { id: bookingId },
+        data: { status: newStatus },
+    });
+
+    return updatedBooking;
+}
+
 export const BookingService = {
     createBooking,
     getUsersBookings,
     getBookingById,
     getAllBookingsForAdmin,
+    updateBookingStatus
 };

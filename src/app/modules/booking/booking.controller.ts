@@ -3,6 +3,7 @@ import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
 import { BookingService } from "./booking.service.js";
 import { UserRole } from "../../middlewares/auth.js";
+import { BookingStatus } from "@prisma/client";
 
 const createBooking = catchAsync(async (req: Request, res: Response) => {
     // Student ID will come from the authenticated user
@@ -69,9 +70,26 @@ const getAllBookingsForAdmin = catchAsync(async (req: Request, res: Response) =>
     });
 });
 
+const updateBookingStatus = catchAsync(async (req: Request, res: Response) => {
+    const bookingId = req.params.id;
+    const userId = req.user?.id as string;
+    const userRole = req.user?.role as UserRole;
+    const { status } = req.body as { status: BookingStatus };
+
+    const result = await BookingService.updateBookingStatus(bookingId as string, userId, userRole, status);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Booking status updated successfully',
+        data: result,
+    });
+});
+
 export const BookingController = {
     createBooking,
     getUsersBookings,
     getBookingById,
     getAllBookingsForAdmin,
+    updateBookingStatus
 };

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { BookingStatus } from '@prisma/client';
 
 const createBookingZodSchema = z.object({
   body: z.object({
@@ -26,6 +27,15 @@ const createBookingZodSchema = z.object({
   }),
 });
 
+const updateBookingStatusZodSchema = z.object({
+  body: z.object({
+    status: z.enum([BookingStatus.COMPLETED, BookingStatus.CANCELLED], {
+      message: 'Status must be either COMPLETED or CANCELLED',
+    }),
+  }),
+});
+
 export const BookingValidation = {
   createBookingZodSchema,
+  updateBookingStatusZodSchema,
 };

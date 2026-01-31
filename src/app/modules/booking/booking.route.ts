@@ -28,6 +28,14 @@ router.get(
     BookingController.getAllBookingsForAdmin
 );
 
+// Update booking status - Student (cancel) or Tutor (complete)
+router.patch(
+    "/:id/status",
+    auth(UserRole.STUDENT, UserRole.TUTOR),
+    validateRequest(BookingValidation.updateBookingStatusZodSchema),
+    BookingController.updateBookingStatus
+);
+
 // Get single booking - Student, Tutor or Admin (permission checked in service)
 router.get(
     "/:id",

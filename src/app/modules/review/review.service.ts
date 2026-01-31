@@ -80,7 +80,17 @@ const createReview = async (studentId: string, payload: ICreateReviewPayload) =>
 };
 
 const getReviewsForTutor = async (tutorId: string) => {
-    return prisma.review.findMany({ where: { tutorId } });
+    return prisma.review.findMany({
+        where: { tutorId },
+        include: {
+            student: {
+                select: {
+                    name: true,
+                    image: true,
+                },
+            },
+        },
+    });
 };
 
 export const ReviewService = {

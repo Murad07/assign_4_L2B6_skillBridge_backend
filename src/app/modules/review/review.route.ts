@@ -6,6 +6,13 @@ import { ReviewController } from './review.controller.js';
 
 const router = express.Router();
 
+// get reviews for a tutor
+router.get(
+    '/:tutorId',
+    auth(UserRole.STUDENT, UserRole.TUTOR, UserRole.ADMIN),
+    ReviewController.getReviewsForTutor
+);
+
 // Student only - create review
 router.post(
     '/',

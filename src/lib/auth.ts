@@ -22,4 +22,11 @@ export const auth = betterAuth({
             },
         },
     },
+    trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:3000"],
+    advanced: {
+        defaultCookieAttributes: {
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            secure: process.env.NODE_ENV === "production",
+        },
+    },
 });

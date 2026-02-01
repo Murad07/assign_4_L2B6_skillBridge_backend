@@ -13,6 +13,9 @@ router.get('/', auth(UserRole.ADMIN), UserController.getAllUsersForAdmin);
 router.get('/:id', auth(UserRole.ADMIN), UserController.getUserById);
 
 // Admin only - update user status
-router.patch('/:id', auth(UserRole.ADMIN), validateRequest(UserValidation.updateUserStatusZodSchema), UserController.patchUserStatus);
+router.patch('/:id/status', auth(UserRole.ADMIN), validateRequest(UserValidation.updateUserStatusZodSchema), UserController.patchUserStatus);
+
+// Admin only - update user role
+router.patch('/:id/role', auth(UserRole.ADMIN), validateRequest(UserValidation.updateUserRoleZodSchema), UserController.patchUserRole);
 
 export const UserRoutes = router;

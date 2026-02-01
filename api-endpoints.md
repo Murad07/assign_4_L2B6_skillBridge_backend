@@ -67,11 +67,12 @@ This document provides a comprehensive list of all API endpoints for the applica
 
 ## User Management (`/admin/users`)
 
-| Method  | Endpoint | Access | Description                                      |
-| :------ | :------- | :----- | :----------------------------------------------- |
-| `GET`   | `/`      | Admin  | Get a list of all users in the system.           |
-| `GET`   | `/:id`   | Admin  | Get details of a single user by their ID.        |
-| `PATCH` | `/:id`   | Admin  | Update the status (e.g., active, suspended) of a user. |
+| Method  | Endpoint     | Access | Description                                      |
+| :------ | :----------- | :----- | :----------------------------------------------- |
+| `GET`   | `/`          | Admin  | Get a list of all users in the system.           |
+| `GET`   | `/:id`       | Admin  | Get details of a single user by their ID.        |
+| `PATCH` | `/:id/status`| Admin  | Update the status (e.g., active, suspended) of a user. |
+| `PATCH` | `/:id/role`  | Admin  | Update the role  of a user.                      |
 
 ---
 

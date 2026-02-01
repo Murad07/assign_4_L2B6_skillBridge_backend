@@ -95,6 +95,21 @@ const updateUserStatus = async (id: string, status: string) => {
     return updated;
 };
 
+const updateUserRole = async (id: string, role: string) => {
+    const allowedRoles = ['Student', 'Tutor', 'Admin'];
+    if (!allowedRoles.includes(role)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid role value');
+    }
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    const updated = await prisma.user.update({ where: { id }, data: { role } });
+    return updated;
+};
+
 const updateUserProfile = async (id: string, payload: { name?: string; phone?: string }) => {
     const { name, phone } = payload;
 
@@ -118,6 +133,7 @@ export const UserService = {
     getAllUsersForAdmin,
     getUserById,
     updateUserStatus,
+    updateUserRole,
     updateUserProfile,
 };
 

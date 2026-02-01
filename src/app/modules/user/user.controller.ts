@@ -50,6 +50,20 @@ const patchUserStatus = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const patchUserRole = catchAsync(async (req: Request, res: Response) => {
+    const id = String(req.params.id);
+    const role = String(req.body.role);
+
+    const updated = await UserService.updateUserRole(id, role);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User role updated successfully',
+        data: updated,
+    });
+});
+
 const patchUserProfile = catchAsync(async (req: Request, res: Response) => {
     const id = req.user?.id as string;
     const { name, phone } = req.body;
@@ -68,6 +82,7 @@ export const UserController = {
     getAllUsersForAdmin,
     getUserById,
     patchUserStatus,
+    patchUserRole,
     patchUserProfile,
 };
 

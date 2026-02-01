@@ -9,6 +9,17 @@ const updateUserStatusZodSchema = z.object({
     }),
 });
 
+const updateUserRoleZodSchema = z.object({
+    params: z.object({
+        id: z.string({ message: 'User id is required' }),
+    }),
+    body: z.object({
+        role: z.enum(['Student', 'Tutor', 'Admin'] as const, {
+            message: 'Role is required and must be one of STUDENT, TUTOR, ADMIN',
+        }),
+    }),
+});
+
 const updateUserProfileZodSchema = z.object({
     body: z.object({
         name: z.string().min(1).optional(),
@@ -19,4 +30,5 @@ const updateUserProfileZodSchema = z.object({
 export const UserValidation = {
     updateUserStatusZodSchema,
     updateUserProfileZodSchema,
+    updateUserRoleZodSchema,
 };

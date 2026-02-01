@@ -8,6 +8,9 @@ import router from './app/routes/index.js';
 
 const app: Application = express();
 
+// Trust proxy is required for secure cookies (https) when deployed behind a proxy (like Vercel/Render/Heroku)
+app.set('trust proxy', 1);
+
 // Middlewares
 app.use(
     cors({

@@ -9,7 +9,7 @@ SkillBridge is a comprehensive full-stack web application designed to bridge the
 ## 🔗 Important Links
 
 - **🌐 Live Frontend Site URL:** [https://assign-4-l2b6-sb-frontend.vercel.app/](https://assign-4-l2b6-sb-frontend.vercel.app/)
-- **🌐 Live Backend Site URL:** [https://assign-4-l2b6-sb-backend.vercel.app/](https://assign-4-l2b6-sb-backend.vercel.app/)
+- **🌐 Live Backend Site URL:** [http://assign-4-l2-b6-skill-bridge-backend.vercel.app/](http://assign-4-l2-b6-skill-bridge-backend.vercel.app/)
 - **📄 API Documentation:** [View API Endpoints](./api-endpoints.md)
 - **📄 Video Demo:** [View Video Demo](https://drive.google.com/file/d/1VxtOKcx3KtuAcC-LaC-ewpPY-6I7DF6G/view?usp=drive_link)
 

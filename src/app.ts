@@ -14,9 +14,10 @@ app.set('trust proxy', 1);
 // Middlewares
 app.use(
     cors({
-        origin: config.node_env === 'development'
-            ? config.frontend_url
-            : process.env.FRONTEND_URL,
+        origin: [
+            config.frontend_url || "https://assign-4-l2b6-sb-frontend.vercel.app",
+            "http://localhost:3000"
+        ],
         credentials: true,
     })
 );

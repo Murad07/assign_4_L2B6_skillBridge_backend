@@ -20,8 +20,8 @@ router.all(
     toNodeHandler(auth)
 );
 
-router.all("/{*any}", async (req, res) => {
-    return await toNodeHandler(auth)(req, res);
+router.use((req, res) => {
+    return toNodeHandler(auth)(req, res);
 });
 
 export const AuthRoutes = router;

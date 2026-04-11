@@ -22,25 +22,47 @@ router.get("/session-exchange", async (req: Request, res: Response) => {
             return;
         }
 
-        const backendUrl =
-            process.env.BETTER_AUTH_URL ||
+        const backendUrl = process.env.BETTER_AUTH_URL ||
             "https://assign-4-l2-b6-skill-bridge-backend.vercel.app";
+
+        // ✅ Decode token in case it came URL-encoded
+        const decodedToken = decodeURIComponent(token);
 
         const fakeRequest = new Request(
             `${backendUrl}/api/auth/get-session`,
             {
-                headers: {
-                    "Cookie": `better-auth.session_token=${token}`,
+                method: "GET",
+                headers: new Headers({
+                    "Cookie": `better-auth.session_token=${decodedToken}`,
                     "Content-Type": "application/json",
-                },
+                    // ✅ better-auth needs the origin to validate the request
+                    "Origin": backendUrl,
+                    "Host": new URL(backendUrl).host,
+                }),
             }
         );
 
         const sessionRes = await auth.handler(fakeRequest);
-        const data = await sessionRes.json();
+
+        // ✅ Check if response has a body before parsing
+        const text = await sessionRes.text();
+        console.log("session-exchange raw response:", text, "status:", sessionRes.status);
+
+        if (!text) {
+            res.status(401).json({ error: "Empty response from auth handler" });
+            return;
+        }
+
+        let data: any;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            res.status(500).json({ error: "Invalid JSON from auth handler", raw: text });
+            return;
+        }
 
         if (!data?.user) {
-            res.status(401).json({ error: "Invalid or expired session" });
+            res.status(401).json({ error: "Invalid or expired session", detail: data });
             return;
         }
 
@@ -48,7 +70,7 @@ router.get("/session-exchange", async (req: Request, res: Response) => {
             success: true,
             user: data.user,
             session: data.session,
-            token: token,
+            token: decodedToken,
         });
     } catch (err: any) {
         res.status(500).json({ error: err.message || "Session exchange failed" });

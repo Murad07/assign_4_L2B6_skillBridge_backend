@@ -3,6 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma.js";
 
 const FRONTEND_URL = process.env.FRONTEND_URL || "https://assign-4-l2b6-sb-frontend.vercel.app";
+const BACKEND_URL = process.env.BETTER_AUTH_URL || "https://assign-4-l2-b6-skill-bridge-backend.vercel.app";
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -30,6 +31,7 @@ export const auth = betterAuth({
     },
     trustedOrigins: [
         FRONTEND_URL,
+        BACKEND_URL, // ✅ allow backend to call itself
         "http://localhost:3000",
     ],
     advanced: {

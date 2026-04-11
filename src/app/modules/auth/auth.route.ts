@@ -7,12 +7,13 @@ import checkAuth from '../../middlewares/auth.js';
 import { AuthController } from './auth.controller.js';
 
 const FRONTEND_URL = process.env.FRONTEND_URL || "https://assign-4-l2b6-sb-frontend.vercel.app";
+const BACKEND_URL = process.env.BETTER_AUTH_URL || "https://assign-4-l2-b6-skill-bridge-backend.vercel.app";
 
 const router = express.Router();
 
 router.get("/me", checkAuth(), AuthController.getMe);
 
-// ✅ Session exchange endpoint
+// ✅ Session exchange — validates token and returns user info
 router.get("/session-exchange", async (req: Request, res: Response) => {
     try {
         const rawToken = (req.headers["x-session-token"] || req.query.token) as string;
@@ -24,25 +25,22 @@ router.get("/session-exchange", async (req: Request, res: Response) => {
 
         const decodedToken = decodeURIComponent(rawToken);
 
-        const backendUrl = process.env.BETTER_AUTH_URL ||
-            "https://assign-4-l2-b6-skill-bridge-backend.vercel.app";
+        console.log("session-exchange: token received:", decodedToken.slice(0, 20) + "...");
 
-        // ✅ Real HTTP fetch instead of auth.handler fake request
-        const sessionRes = await fetch(`${backendUrl}/api/auth/get-session`, {
+        const sessionRes = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
             method: "GET",
             headers: {
                 "Cookie": `better-auth.session_token=${decodedToken}`,
                 "Content-Type": "application/json",
-                "Origin": backendUrl,
+                "Origin": BACKEND_URL,  // ✅ must match trustedOrigins
             },
-            cache: "no-store" as RequestCache,
         });
 
         const text = await sessionRes.text();
         console.log("get-session status:", sessionRes.status, "body:", text);
 
-        if (!text) {
-            res.status(401).json({ error: "Empty response from get-session" });
+        if (!text || !text.startsWith("{")) {
+            res.status(401).json({ error: "Empty or invalid response from get-session", status: sessionRes.status });
             return;
         }
 
@@ -50,7 +48,7 @@ router.get("/session-exchange", async (req: Request, res: Response) => {
         try {
             data = JSON.parse(text);
         } catch (e) {
-            res.status(500).json({ error: "Invalid JSON", raw: text });
+            res.status(500).json({ error: "Invalid JSON from get-session", raw: text });
             return;
         }
 
@@ -66,6 +64,7 @@ router.get("/session-exchange", async (req: Request, res: Response) => {
             token: decodedToken,
         });
     } catch (err: any) {
+        console.error("session-exchange error:", err);
         res.status(500).json({ error: err.message || "Session exchange failed" });
     }
 });
@@ -76,7 +75,7 @@ router.all(
     toNodeHandler(auth)
 );
 
-// ✅ Intercept the Google OAuth callback to inject token into redirect URL
+// ✅ Catch-all: intercepts Google OAuth callback to inject token into redirect URL
 router.use(async (req: Request, res: Response) => {
     const isCallback = req.path.includes("/callback");
 
@@ -90,16 +89,13 @@ router.use(async (req: Request, res: Response) => {
     res.writeHead = function (statusCode: number, headers?: any) {
         try {
             if (statusCode === 302 || statusCode === 301) {
-                // Get location from the headers being written
                 let location: string =
                     (headers?.location || headers?.Location || "") as string;
 
                 if (!location) {
-                    // Fall back to already-set header
                     location = (res.getHeader("location") || res.getHeader("Location") || "") as string;
                 }
 
-                // Extract token from Set-Cookie already set on res
                 const setCookieHeader = res.getHeader("set-cookie");
                 const cookies: string[] = Array.isArray(setCookieHeader)
                     ? setCookieHeader as string[]
@@ -117,21 +113,23 @@ router.use(async (req: Request, res: Response) => {
                     }
                 }
 
+                console.log("callback writeHead — location:", location, "token found:", !!token);
+
                 if (token && location.includes("/auth/bridge")) {
                     const separator = location.includes("?") ? "&" : "?";
                     const newLocation = `${location}${separator}token=${encodeURIComponent(token)}`;
 
-                    // Patch the location in headers
                     if (headers && typeof headers === "object") {
                         headers.location = newLocation;
                         headers.Location = newLocation;
                     } else {
                         res.setHeader("Location", newLocation);
                     }
+
+                    console.log("callback writeHead — new location:", newLocation);
                 }
             }
         } catch (e) {
-            // Never break the response, just continue
             console.error("writeHead intercept error:", e);
         }
 

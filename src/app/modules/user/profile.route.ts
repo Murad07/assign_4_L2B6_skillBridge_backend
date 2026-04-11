@@ -9,7 +9,7 @@ const router = express.Router();
 // Current user profile update (Student/Tutor)
 router.patch(
     '/profile',
-    auth(UserRole.STUDENT, UserRole.TUTOR),
+    auth(UserRole.STUDENT, UserRole.TUTOR, UserRole.ADMIN, UserRole.MANAGER, UserRole.MODERATOR),
     validateRequest(UserValidation.updateUserProfileZodSchema),
     UserController.patchUserProfile
 );

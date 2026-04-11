@@ -15,41 +15,34 @@ router.get("/me", checkAuth(), AuthController.getMe);
 // ✅ Session exchange endpoint
 router.get("/session-exchange", async (req: Request, res: Response) => {
     try {
-        const token = (req.headers["x-session-token"] || req.query.token) as string;
+        const rawToken = (req.headers["x-session-token"] || req.query.token) as string;
 
-        if (!token) {
+        if (!rawToken) {
             res.status(401).json({ error: "No token provided" });
             return;
         }
 
+        const decodedToken = decodeURIComponent(rawToken);
+
         const backendUrl = process.env.BETTER_AUTH_URL ||
             "https://assign-4-l2-b6-skill-bridge-backend.vercel.app";
 
-        // ✅ Decode token in case it came URL-encoded
-        const decodedToken = decodeURIComponent(token);
+        // ✅ Real HTTP fetch instead of auth.handler fake request
+        const sessionRes = await fetch(`${backendUrl}/api/auth/get-session`, {
+            method: "GET",
+            headers: {
+                "Cookie": `better-auth.session_token=${decodedToken}`,
+                "Content-Type": "application/json",
+                "Origin": backendUrl,
+            },
+            cache: "no-store" as RequestCache,
+        });
 
-        const fakeRequest = new Request(
-            `${backendUrl}/api/auth/get-session`,
-            {
-                method: "GET",
-                headers: new Headers({
-                    "Cookie": `better-auth.session_token=${decodedToken}`,
-                    "Content-Type": "application/json",
-                    // ✅ better-auth needs the origin to validate the request
-                    "Origin": backendUrl,
-                    "Host": new URL(backendUrl).host,
-                }),
-            }
-        );
-
-        const sessionRes = await auth.handler(fakeRequest);
-
-        // ✅ Check if response has a body before parsing
         const text = await sessionRes.text();
-        console.log("session-exchange raw response:", text, "status:", sessionRes.status);
+        console.log("get-session status:", sessionRes.status, "body:", text);
 
         if (!text) {
-            res.status(401).json({ error: "Empty response from auth handler" });
+            res.status(401).json({ error: "Empty response from get-session" });
             return;
         }
 
@@ -57,7 +50,7 @@ router.get("/session-exchange", async (req: Request, res: Response) => {
         try {
             data = JSON.parse(text);
         } catch (e) {
-            res.status(500).json({ error: "Invalid JSON from auth handler", raw: text });
+            res.status(500).json({ error: "Invalid JSON", raw: text });
             return;
         }
 

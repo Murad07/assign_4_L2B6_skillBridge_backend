@@ -4,7 +4,9 @@ import { auth as betterAuth } from '../../lib/auth.js'
 export enum UserRole {
     STUDENT = "Student",
     TUTOR = "Tutor",
-    ADMIN = "Admin"
+    ADMIN = "Admin",
+    MANAGER = "Manager",
+    MODERATOR = "Moderator"
 }
 
 declare global {

@@ -5,6 +5,8 @@ import { AuthValidation } from './auth.validation.js';
 import validateRequest from '../../middlewares/validateRequest.js';
 import checkAuth from '../../middlewares/auth.js';
 import { AuthController } from './auth.controller.js';
+import { fromNodeHeaders } from "better-auth/node";
+
 
 const FRONTEND_URL = process.env.FRONTEND_URL || "https://assign-4-l2b6-sb-frontend.vercel.app";
 const BACKEND_URL = process.env.BETTER_AUTH_URL || "https://assign-4-l2-b6-skill-bridge-backend.vercel.app";
@@ -24,43 +26,33 @@ router.get("/session-exchange", async (req: Request, res: Response) => {
         }
 
         const decodedToken = decodeURIComponent(rawToken);
+        console.log("session-exchange token:", decodedToken.slice(0, 30) + "...");
 
-        console.log("session-exchange: token received:", decodedToken.slice(0, 20) + "...");
+        // ✅ Use auth.api.getSession directly — bypasses HTTP entirely
+        // Build a Headers object with the token as a cookie
+        const headers = new Headers();
 
-        const sessionRes = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
-            method: "GET",
-            headers: {
-                "Cookie": `better-auth.session_token=${decodedToken}`,
-                "Content-Type": "application/json",
-                "Origin": BACKEND_URL,  // ✅ must match trustedOrigins
-            },
+        // Try both cookie names — better-auth checks __Secure- prefix in prod
+        headers.set(
+            "cookie",
+            `better-auth.session_token=${decodedToken}; __Secure-better-auth.session_token=${decodedToken}`
+        );
+
+        const session = await auth.api.getSession({
+            headers,
         });
 
-        const text = await sessionRes.text();
-        console.log("get-session status:", sessionRes.status, "body:", text);
+        console.log("auth.api.getSession result:", session ? "found" : "null");
 
-        if (!text || !text.startsWith("{")) {
-            res.status(401).json({ error: "Empty or invalid response from get-session", status: sessionRes.status });
-            return;
-        }
-
-        let data: any;
-        try {
-            data = JSON.parse(text);
-        } catch (e) {
-            res.status(500).json({ error: "Invalid JSON from get-session", raw: text });
-            return;
-        }
-
-        if (!data?.user) {
-            res.status(401).json({ error: "Invalid or expired session", detail: data });
+        if (!session?.user) {
+            res.status(401).json({ error: "Invalid or expired session" });
             return;
         }
 
         res.json({
             success: true,
-            user: data.user,
-            session: data.session,
+            user: session.user,
+            session: session.session,
             token: decodedToken,
         });
     } catch (err: any) {

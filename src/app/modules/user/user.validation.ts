@@ -14,8 +14,8 @@ const updateUserRoleZodSchema = z.object({
         id: z.string({ message: 'User id is required' }),
     }),
     body: z.object({
-        role: z.enum(['Student', 'Tutor', 'Admin'] as const, {
-            message: 'Role is required and must be one of STUDENT, TUTOR, ADMIN',
+        role: z.enum(['Student', 'Tutor', 'Admin', 'Manager', 'Moderator'] as const, {
+            message: 'Role is required and must be one of STUDENT, TUTOR, ADMIN, MANAGER, MODERATOR',
         }),
     }),
 });

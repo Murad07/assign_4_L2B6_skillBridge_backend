@@ -32,6 +32,8 @@ const auth = (...roles: UserRole[]) => {
             })
 
             if (!session) {
+                console.warn("Auth Middleware — No session found!");
+                console.log("Incoming Headers:", JSON.stringify(req.headers, null, 2));
                 return res.status(401).json({
                     success: false,
                     message: "You are not authorized!"
@@ -45,6 +47,9 @@ const auth = (...roles: UserRole[]) => {
             //     })
             // }
 
+            console.log("Auth Middleware — User Role:", session.user.role);
+            console.log("Auth Middleware — Required Roles:", roles);
+
             req.user = {
                 id: session.user.id,
                 email: session.user.email,
@@ -55,6 +60,7 @@ const auth = (...roles: UserRole[]) => {
 
 
             if (roles.length && !roles.includes(req.user.role as UserRole)) {
+                console.warn(`Access Denied: User role '${req.user.role}' not in required list:`, roles);
                 return res.status(403).json({
                     success: false,
                     message: "Forbidden! You don't have permission to access this resources!"

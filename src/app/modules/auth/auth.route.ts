@@ -62,7 +62,6 @@ router.all(
 );
 
 // ✅ Intercept the Google OAuth callback to inject token into redirect URL
-// This wraps the catch-all handler and modifies the response for /callback routes
 router.use(async (req: Request, res: Response) => {
     const isCallback = req.path.includes("/callback");
 
@@ -70,40 +69,58 @@ router.use(async (req: Request, res: Response) => {
         return toNodeHandler(auth)(req, res);
     }
 
-    // Intercept the response for callback routes
     const originalWriteHead = res.writeHead.bind(res);
-    const originalRedirect = res.redirect.bind(res);
 
-    // Override redirect to inject token
-    (res as any).redirect = function (url: string) {
+    // @ts-ignore
+    res.writeHead = function (statusCode: number, headers?: any) {
         try {
-            // Extract Set-Cookie header that better-auth set
-            const setCookieHeader = res.getHeader("set-cookie");
-            const cookies = Array.isArray(setCookieHeader)
-                ? setCookieHeader
-                : [setCookieHeader as string].filter(Boolean);
+            if (statusCode === 302 || statusCode === 301) {
+                // Get location from the headers being written
+                let location: string =
+                    (headers?.location || headers?.Location || "") as string;
 
-            let token: string | null = null;
+                if (!location) {
+                    // Fall back to already-set header
+                    location = (res.getHeader("location") || res.getHeader("Location") || "") as string;
+                }
 
-            for (const cookie of cookies) {
-                if (!cookie) continue;
-                const match = cookie.match(/(?:__Secure-)?better-auth\.session_token=([^;]+)/);
-                if (match?.[1]) {
-                    token = match[1];
-                    break;
+                // Extract token from Set-Cookie already set on res
+                const setCookieHeader = res.getHeader("set-cookie");
+                const cookies: string[] = Array.isArray(setCookieHeader)
+                    ? setCookieHeader as string[]
+                    : [setCookieHeader as string].filter(Boolean);
+
+                let token: string | null = null;
+                for (const cookie of cookies) {
+                    if (!cookie) continue;
+                    const match = cookie.match(
+                        /(?:__Secure-)?better-auth\.session_token=([^;]+)/
+                    );
+                    if (match?.[1]) {
+                        token = decodeURIComponent(match[1]);
+                        break;
+                    }
+                }
+
+                if (token && location.includes("/auth/bridge")) {
+                    const separator = location.includes("?") ? "&" : "?";
+                    const newLocation = `${location}${separator}token=${encodeURIComponent(token)}`;
+
+                    // Patch the location in headers
+                    if (headers && typeof headers === "object") {
+                        headers.location = newLocation;
+                        headers.Location = newLocation;
+                    } else {
+                        res.setHeader("Location", newLocation);
+                    }
                 }
             }
-
-            // If we found a token and it's going to the bridge, append token
-            if (token && url.includes("/auth/bridge")) {
-                const separator = url.includes("?") ? "&" : "?";
-                url = `${url}${separator}token=${encodeURIComponent(token)}`;
-            }
         } catch (e) {
-            // If anything fails, just redirect normally
+            // Never break the response, just continue
+            console.error("writeHead intercept error:", e);
         }
 
-        return originalRedirect(url);
+        return originalWriteHead(statusCode, headers);
     };
 
     return toNodeHandler(auth)(req, res);

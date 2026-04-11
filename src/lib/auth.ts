@@ -15,8 +15,6 @@ export const auth = betterAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
         },
     },
-    // Provide a secret explicitly so the library doesn't fall back to a default insecure secret.
-    // Prefer BETTER_AUTH_SECRET; fallback to JWT_SECRET if present.
     secret: process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET,
     user: {
         additionalFields: {
@@ -30,12 +28,15 @@ export const auth = betterAuth({
     },
     trustedOrigins: [
         process.env.FRONTEND_URL || "https://assign-4-l2b6-sb-frontend.vercel.app",
-        "http://localhost:3000"
+        "http://localhost:3000",
     ],
     advanced: {
         defaultCookieAttributes: {
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             secure: process.env.NODE_ENV === "production",
         },
+        // ✅ This tells better-auth to accept the token from the Authorization header
+        // so our Next.js API route can validate sessions without relying on cookie forwarding
+        useSecureCookies: process.env.NODE_ENV === "production",
     },
 });

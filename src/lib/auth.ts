@@ -27,6 +27,17 @@ export const auth = betterAuth({
                 defaultValue: "Student",
                 input: true,
             },
+            phone: {
+                type: "string",
+                required: false,
+                input: true,
+            },
+            status: {
+                type: "string",
+                required: false,
+                defaultValue: "ACTIVE",
+                input: true,
+            },
         },
     },
     trustedOrigins: [

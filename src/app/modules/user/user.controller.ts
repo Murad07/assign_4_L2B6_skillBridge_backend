@@ -68,6 +68,9 @@ const patchUserProfile = catchAsync(async (req: Request, res: Response) => {
     const id = req.user?.id as string;
     const { name, phone, image } = req.body;
 
+    console.log("Profile update request for user ID:", id);
+    console.log("Payload:", { name, phone, image });
+
     const updated = await UserService.updateUserProfile(id, { name, phone, image });
 
     sendResponse(res, {

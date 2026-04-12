@@ -183,12 +183,6 @@ const getPendingTutors = async (req: Request, res: Response, next: NextFunction)
             });
         }
 
-        if (user.role !== UserRole.ADMIN) {
-            return res.status(403).json({
-                error: "Forbidden - ADMIN access required"
-            });
-        }
-
         const pendingTutors = await tutorService.getPendingTutors();
         res.status(200).json(pendingTutors);
     } catch (e) {
@@ -202,12 +196,6 @@ const approveTutor = async (req: Request, res: Response, next: NextFunction) => 
         if (!user) {
             return res.status(401).json({
                 error: "Unauthorized!",
-            });
-        }
-
-        if (user.role !== UserRole.ADMIN) {
-            return res.status(403).json({
-                error: "Forbidden - ADMIN access required"
             });
         }
 
@@ -226,12 +214,6 @@ const rejectTutor = async (req: Request, res: Response, next: NextFunction) => {
         if (!user) {
             return res.status(401).json({
                 error: "Unauthorized!",
-            });
-        }
-
-        if (user.role !== UserRole.ADMIN) {
-            return res.status(403).json({
-                error: "Forbidden - ADMIN access required"
             });
         }
 

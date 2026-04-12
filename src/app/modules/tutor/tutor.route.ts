@@ -47,19 +47,19 @@ router.get(
 // ADMIN routes - TUTOR approval
 router.get(
     "/admin/pending",
-    auth(UserRole.ADMIN),
+    auth(UserRole.ADMIN, UserRole.MODERATOR, UserRole.MANAGER),
     TutorController.getPendingTutors
 );
 
 router.patch(
     "/admin/:id/approve",
-    auth(UserRole.ADMIN),
+    auth(UserRole.ADMIN, UserRole.MODERATOR, UserRole.MANAGER),
     TutorController.approveTutor
 );
 
 router.patch(
     "/admin/:id/reject",
-    auth(UserRole.ADMIN),
+    auth(UserRole.ADMIN, UserRole.MODERATOR, UserRole.MANAGER),
     TutorController.rejectTutor
 );
 

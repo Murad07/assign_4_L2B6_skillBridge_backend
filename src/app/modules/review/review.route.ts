@@ -9,7 +9,6 @@ const router = express.Router();
 // get reviews for a tutor
 router.get(
     '/:tutorId',
-    auth(UserRole.STUDENT, UserRole.TUTOR, UserRole.ADMIN),
     ReviewController.getReviewsForTutor
 );
 

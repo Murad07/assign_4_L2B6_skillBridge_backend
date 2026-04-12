@@ -1,230 +1,175 @@
 import { NextFunction, Request, Response } from "express";
 import { tutorService } from "./tutor.service.js";
-import { UserRole } from "../../middlewares/auth.js";
+import catchAsync from "../../utils/catchAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
 import paginationSortingHelper from "../../../helpers/paginationSortingHelper.js";
 
-const getAllTutors = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { search } = req.query;
-        const searchString = typeof search === 'string' ? search : undefined;
+const getAllTutors = catchAsync(async (req: Request, res: Response) => {
+    const { search } = req.query;
+    const searchString = typeof search === 'string' ? search : undefined;
 
-        const categoryId = req.query.categoryId ? req.query.categoryId as string : undefined;
-        const minPrice = req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined;
-        const maxPrice = req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined;
-        const minRating = req.query.minRating ? parseFloat(req.query.minRating as string) : undefined;
-        const expertise = req.query.expertise ? (req.query.expertise as string).split(',') : undefined;
+    const categoryId = req.query.categoryId ? req.query.categoryId as string : undefined;
+    const minPrice = req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined;
+    const maxPrice = req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined;
+    const minRating = req.query.minRating ? parseFloat(req.query.minRating as string) : undefined;
+    const expertise = req.query.expertise ? (req.query.expertise as string).split(',') : undefined;
 
-        const { page, limit, skip, sortBy, sortOrder } = paginationSortingHelper(req.query);
+    const { page, limit, skip, sortBy, sortOrder } = paginationSortingHelper(req.query);
 
-        const tutors = await tutorService.getAllTutors({
-            search: searchString,
-            categoryId,
-            minPrice,
-            maxPrice,
-            minRating,
-            expertise,
-            page,
-            limit,
-            skip,
-            sortBy,
-            sortOrder
+    const result = await tutorService.getAllTutors({
+        search: searchString,
+        categoryId,
+        minPrice,
+        maxPrice,
+        minRating,
+        expertise,
+        page,
+        limit,
+        skip,
+        sortBy,
+        sortOrder
+    });
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Tutors fetched successfully',
+        data: result
+    });
+});
+
+const getTutorById = catchAsync(async (req: Request, res: Response) => {
+    const tutorId = req.params.id;
+    if (!tutorId) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: 'Tutor ID is required',
         });
-
-        res.status(200).json(tutors);
-    } catch (e) {
-        next(e);
     }
-}
 
-const getTutorById = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const tutorId = req.params.id;
-        if (!tutorId) {
-            return res.status(400).json({
-                error: "TUTOR ID is required"
-            });
-        }
-
-        const tutor = await tutorService.getTutorById(tutorId as string);
-        if (!tutor) {
-            return res.status(404).json({
-                error: "TUTOR not found"
-            });
-        }
-
-        res.status(200).json(tutor);
-    } catch (e) {
-        next(e);
+    const result = await tutorService.getTutorById(tutorId as string);
+    if (!result) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: 'Tutor not found',
+        });
     }
-}
 
-const createTutorProfile = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const user = req.user;
-        if (!user) {
-            return res.status(401).json({
-                error: "Unauthorized!",
-            });
-        }
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Tutor fetched successfully',
+        data: result
+    });
+});
 
-        if (user.role !== UserRole.TUTOR) {
-            return res.status(403).json({
-                error: "Forbidden - TUTOR access required"
-            });
-        }
+const createTutorProfile = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user;
+    const result = await tutorService.createTutorProfile(req.body, user?.id as string);
 
-        const result = await tutorService.createTutorProfile(req.body, user.id as string);
-        res.status(201).json(result);
-    } catch (e) {
-        next(e);
+    sendResponse(res, {
+        statusCode: 201,
+        success: true,
+        message: 'Tutor profile created successfully',
+        data: result
+    });
+});
+
+const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user;
+    const result = await tutorService.getMyProfile(user?.id as string);
+
+    if (!result) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: 'Tutor profile not found',
+        });
     }
-}
 
-const getMyProfile = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const user = req.user;
-        if (!user) {
-            return res.status(401).json({
-                error: "Unauthorized!",
-            });
-        }
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Tutor profile fetched successfully',
+        data: result
+    });
+});
 
-        const profile = await tutorService.getMyProfile(user.id as string);
-        if (!profile) {
-            return res.status(404).json({
-                error: "TUTOR profile not found"
-            });
-        }
+const updateTutorProfile = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user;
+    const updateData = req.body;
+    const result = await tutorService.updateTutorProfile(updateData, user?.id as string);
 
-        res.status(200).json(profile);
-    } catch (e) {
-        next(e);
-    }
-}
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Tutor profile updated successfully',
+        data: result
+    });
+});
 
-const updateTutorProfile = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const user = req.user;
-        if (!user) {
-            return res.status(401).json({
-                error: "Unauthorized!",
-            });
-        }
+const updateAvailability = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user;
+    const { availability } = req.body;
+    const result = await tutorService.updateAvailability(user?.id as string, availability);
 
-        if (user.role !== UserRole.TUTOR) {
-            return res.status(403).json({
-                error: "Forbidden - TUTOR access required"
-            });
-        }
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Availability updated successfully',
+        data: result
+    });
+});
 
-        const updateData = req.body;
-        const updatedProfile = await tutorService.updateTutorProfile(updateData, user.id as string);
+const getMySessions = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user;
+    const status = req.query.status as string | undefined;
+    const result = await tutorService.getMySessions(user?.id as string, status);
 
-        res.status(200).json(updatedProfile);
-    } catch (e) {
-        next(e);
-    }
-}
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Sessions fetched successfully',
+        data: result
+    });
+});
 
-const updateAvailability = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const user = req.user;
-        if (!user) {
-            return res.status(401).json({
-                error: "Unauthorized!",
-            });
-        }
+const getPendingTutors = catchAsync(async (req: Request, res: Response) => {
+    const result = await tutorService.getPendingTutors();
 
-        if (user.role !== UserRole.TUTOR) {
-            return res.status(403).json({
-                error: "Forbidden - TUTOR access required"
-            });
-        }
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Pending tutors fetched successfully',
+        data: result
+    });
+});
 
-        const { availability } = req.body;
-        const updatedProfile = await tutorService.updateAvailability(user.id as string, availability);
+const approveTutor = catchAsync(async (req: Request, res: Response) => {
+    const tutorId = req.params.id;
+    const result = await tutorService.approveTutor(tutorId as string);
 
-        res.status(200).json(updatedProfile);
-    } catch (e) {
-        next(e);
-    }
-}
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Tutor approved successfully',
+        data: result
+    });
+});
 
-const getMySessions = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const user = req.user;
-        if (!user) {
-            return res.status(401).json({
-                error: "Unauthorized!",
-            });
-        }
+const rejectTutor = catchAsync(async (req: Request, res: Response) => {
+    const tutorId = req.params.id;
+    const result = await tutorService.rejectTutor(tutorId as string);
 
-        if (user.role !== UserRole.TUTOR) {
-            return res.status(403).json({
-                error: "Forbidden - TUTOR access required"
-            });
-        }
-
-        const status = req.query.status as string | undefined;
-        const sessions = await tutorService.getMySessions(user.id as string, status);
-
-        res.status(200).json(sessions);
-    } catch (e) {
-        next(e);
-    }
-}
-
-const getPendingTutors = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const user = req.user;
-        if (!user) {
-            return res.status(401).json({
-                error: "Unauthorized!",
-            });
-        }
-
-        const pendingTutors = await tutorService.getPendingTutors();
-        res.status(200).json(pendingTutors);
-    } catch (e) {
-        next(e);
-    }
-}
-
-const approveTutor = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const user = req.user;
-        if (!user) {
-            return res.status(401).json({
-                error: "Unauthorized!",
-            });
-        }
-
-        const tutorId = req.params.id;
-        const approvedTutor = await tutorService.approveTutor(tutorId as string);
-
-        res.status(200).json(approvedTutor);
-    } catch (e) {
-        next(e);
-    }
-}
-
-const rejectTutor = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const user = req.user;
-        if (!user) {
-            return res.status(401).json({
-                error: "Unauthorized!",
-            });
-        }
-
-        const tutorId = req.params.id;
-        const rejectedTutor = await tutorService.rejectTutor(tutorId as string);
-
-        res.status(200).json(rejectedTutor);
-    } catch (e) {
-        next(e);
-    }
-}
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Tutor rejected successfully',
+        data: result
+    });
+});
 
 export const TutorController = {
     getAllTutors,

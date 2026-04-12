@@ -110,8 +110,8 @@ const updateUserRole = async (id: string, role: string) => {
     return updated;
 };
 
-const updateUserProfile = async (id: string, payload: { name?: string; phone?: string }) => {
-    const { name, phone } = payload;
+const updateUserProfile = async (id: string, payload: { name?: string; phone?: string; image?: string }) => {
+    const { name, phone, image } = payload;
 
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
@@ -121,8 +121,9 @@ const updateUserProfile = async (id: string, payload: { name?: string; phone?: s
     const updated = await prisma.user.update({
         where: { id },
         data: {
-            ...(name ? { name } : {}),
-            ...(phone ? { phone } : {}),
+            ...(name !== undefined && { name }),
+            ...(phone !== undefined && { phone }),
+            ...(image !== undefined && { image }),
         },
     });
 

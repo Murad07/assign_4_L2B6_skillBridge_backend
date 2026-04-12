@@ -66,9 +66,9 @@ const patchUserRole = catchAsync(async (req: Request, res: Response) => {
 
 const patchUserProfile = catchAsync(async (req: Request, res: Response) => {
     const id = req.user?.id as string;
-    const { name, phone } = req.body;
+    const { name, phone, image } = req.body;
 
-    const updated = await UserService.updateUserProfile(id, { name, phone });
+    const updated = await UserService.updateUserProfile(id, { name, phone, image });
 
     sendResponse(res, {
         statusCode: 200,

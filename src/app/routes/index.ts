@@ -7,6 +7,7 @@ import { ReviewRoutes } from '../modules/review/review.route.js';
 import { UserRoutes } from '../modules/user/user.route.js';
 import { ProfileRoutes } from '../modules/user/profile.route.js';
 import { OverviewRoutes } from '../modules/user/overview.route.js';
+import { MetaRoutes } from '../modules/meta/meta.route.js';
 
 const router = Router();
 
@@ -44,6 +45,10 @@ const moduleRoutes = [
     {
         path: '/users/overview',
         route: OverviewRoutes,
+    },
+    {
+        path: '/meta',
+        route: MetaRoutes
     }
 ];
 
